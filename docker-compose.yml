@@ -1,0 +1,37 @@
+version: '2'
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "8088:80"
+    volumes:
+      - ./code:/code/
+      - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./conf/nginx/conf/:/etc/nginx/conf/
+      - ./conf/nginx/sites/:/etc/nginx/sites/
+    networks:
+      default:
+        aliases:
+          - notus.devs
+
+  php:
+    build: .
+    volumes:
+      - ./code:/code
+    environment:
+      - php.extension=intl.so
+
+  database:
+    image: mysql:5.7
+    networks:
+       - default
+    environment:
+    - MYSQL_DATABASE=notus
+    - MYSQL_USER=homestead
+    - MYSQL_PASSWORD=secret
+    - MYSQL_ROOT_PASSWORD=secret
+    ports:
+    - "3307:3306"
+    command: --innodb-flush-method=O_DSYNC
+    volumes:
+      - ./db:/var/lib/mysql
